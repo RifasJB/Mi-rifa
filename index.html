@@ -2,159 +2,68 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sorteo Premium 🎟️</title>
-    
-    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1008/1008011.png">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1008/1008011.png">
-    
+    <title>Mi Sistema de Sorteos</title>
     <style>
-        :root { --oro: #d4af37; --oscuro: #0f172a; --acento: #3b82f6; --fondo: #f8fafc; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--fondo); margin: 0; color: var(--oscuro); line-height: 1.5; }
-        .app-container { max-width: 500px; margin: 0 auto; padding: 20px; }
-
-        /* Tarjeta Principal */
-        .main-card { background: white; border-radius: 32px; padding: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
-        .hero-img { width: 100%; height: 240px; border-radius: 24px; object-fit: cover; margin-bottom: 20px; }
-        
-        /* Grid de Boletos */
-        .ticket-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; max-height: 350px; overflow-y: auto; padding: 10px; background: #f1f5f9; border-radius: 20px; }
-        .t { padding: 15px 0; background: white; border-radius: 12px; font-weight: 700; cursor: pointer; border: 1.5px solid #e2e8f0; transition: 0.2s; font-size: 15px; }
-        .t.selected { background: var(--oscuro); color: white; border-color: var(--oscuro); transform: scale(1.05); }
-        .t.pending { background: #fef9c3; color: #a16207; border-color: #fde047; cursor: not-allowed; }
-        .t.sold { background: #fee2e2; color: #991b1b; border-color: #fecaca; cursor: not-allowed; text-decoration: line-through; }
-
-        /* Sección de Pago Inteligente */
-        .payment-info { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 20px; padding: 15px; margin: 20px 0; display: none; }
-        .payment-info.active { display: block; animation: slideUp 0.3s ease; }
-        .copy-btn { background: #e2e8f0; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; margin-left: 5px; }
-
-        /* Footer y Botón */
-        input { width: 100%; padding: 16px; border-radius: 16px; border: 1.5px solid #e2e8f0; font-size: 16px; margin-bottom: 15px; outline: none; }
-        input:focus { border-color: var(--acento); }
-        .btn-pay { background: var(--oscuro); color: white; width: 100%; border: none; padding: 18px; border-radius: 18px; font-size: 17px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        
-        .timer-badge { font-size: 12px; background: #ffedd5; color: #9a3412; padding: 4px 12px; border-radius: 20px; display: inline-block; margin-bottom: 10px; }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; }
+        .grid-boletos { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); 
+            gap: 10px; padding: 20px; max-width: 800px; margin: auto; 
+        }
+        .boleto { 
+            padding: 15px; border: 1px solid #ccc; background: white; 
+            cursor: pointer; border-radius: 5px; 
+        }
+        .boleto.seleccionado { background-color: #28a745; color: white; }
+        .boleto.ocupado { background-color: #dc3545; cursor: not-allowed; }
+        .btn-comprar { padding: 15px 30px; font-size: 1.2rem; background: #007bff; color: white; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="main-card">
-        <img src="https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?q=80&w=800" class="hero-img">
-        <div class="timer-badge">⌛ Apartado dura 24 Horas</div>
-        <h1 style="margin:0; font-size: 24px;">Sorteo de Lujo</h1>
-        <p style="color: #64748b; font-size: 14px; margin-top: 5px;">Selecciona tus boletos y sigue los pasos.</p>
+    <h1>Sorteo Gran Camioneta 2026</h1>
+    <p>Selecciona tus números de la suerte:</p>
 
-        <div class="ticket-grid" id="grid"></div>
+    <div id="contenedor-boletos" class="grid-boletos"></div>
 
-        <div id="bookingSection">
-            <input type="text" id="userName" placeholder="Tu nombre completo">
-            
-            <div id="paymentBox" class="payment-info">
-                <p style="margin: 0 0 10px 0; font-size: 13px; font-weight: bold; color: var(--acento);">PASO 1: PAGA POR TRANSFERENCIA</p>
-                <div style="font-size: 13px; color: #475569;">
-                    <b>Banco:</b> Tu Banco <br>
-                    <b>CLABE:</b> <span id="clabe">012345678901234567</span> <button class="copy-btn" onclick="copy('012345678901234567')">Copiar</button> <br>
-                    <b>Titular:</b> Tu Nombre Completo
-                </div>
-            </div>
-
-            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <span id="summary" style="font-size: 14px; font-weight: 600;">-</span>
-                <span id="total" style="font-size: 22px; font-weight: 800;">$0</span>
-            </div>
-
-            <button class="btn-pay" onclick="handleBooking()">
-                RESERVAR Y ENVIAR COMPROBANTE
-            </button>
-        </div>
+    <div style="margin-top: 20px;">
+        <h3>Boletos seleccionados: <span id="contador">0</span></h3>
+        <button class="btn-comprar" onclick="procesarCompra()">Comprar Ahora</button>
     </div>
-</div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <script>
+        // Configuración inicial
+        const totalBoletos = 100;
+        const seleccionados = [];
+        const contenedor = document.getElementById('contenedor-boletos');
 
-    // 1. CONFIGURACIÓN FIREBASE
-    const firebaseConfig = {
-        apiKey: "AIzaSyBjIMcO-Zo0nOe6R8Ahepq3wxAb3gBFFeo",
-  authDomain: "mi-rifa-dcc26.firebaseapp.com",
-  projectId: "mi-rifa-dcc26",
-  storageBucket: "mi-rifa-dcc26.firebasestorage.app",
-  messagingSenderId: "739288260425",
-  appId: "1:739288260425:web:3e1a8081c0575aeb29c498"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // 2. CONFIGURACIÓN RIFA
-    const RIFA = {
-        total: 100,
-        precio: 200, // Precio por boleto
-        whatsapp: "521234567890" // Tu número real aquí
-    };
-
-    let selected = [];
-    let dbStatus = {};
-
-    onSnapshot(collection(db, "boletos_vendidos"), (snap) => {
-        dbStatus = {};
-        snap.docs.forEach(d => dbStatus[d.id] = d.data());
-        render();
-    });
-
-    function render() {
-        const grid = document.getElementById('grid');
-        grid.innerHTML = "";
-        for (let i = 1; i <= RIFA.total; i++) {
-            const id = i.toString().padStart(2, '0');
-            const data = dbStatus[id];
+        // Generar los boletos dinámicamente
+        for (let i = 1; i <= totalBoletos; i++) {
             const div = document.createElement('div');
-            div.innerText = id;
-            div.className = `t ${data ? (data.pago === 'confirmado' ? 'sold' : 'pending') : ''} ${selected.includes(i) ? 'selected' : ''}`;
+            div.classList.add('boleto');
+            div.innerText = i.toString().padStart(3, '0');
             
-            if (!data) div.onclick = () => toggle(i);
-            grid.appendChild(div);
+            div.onclick = () => {
+                if (div.classList.contains('seleccionado')) {
+                    div.classList.remove('seleccionado');
+                    seleccionados.splice(seleccionados.indexOf(i), 1);
+                } else {
+                    div.classList.add('seleccionado');
+                    seleccionados.push(i);
+                }
+                document.getElementById('contador').innerText = seleccionados.length;
+            };
+            
+            contenedor.appendChild(div);
         }
-    }
 
-    function toggle(n) {
-        selected.includes(n) ? selected = selected.filter(x => x !== n) : selected.push(n);
-        document.getElementById('summary').innerText = selected.length > 0 ? "Boletos: " + selected.join(", ") : "-";
-        document.getElementById('total').innerText = "$" + (selected.length * RIFA.precio);
-        document.getElementById('paymentBox').className = selected.length > 0 ? "payment-info active" : "payment-info";
-        render();
-    }
-
-    window.copy = (txt) => { navigator.clipboard.writeText(txt); alert("Copiado al portapapeles"); };
-
-    window.handleBooking = async () => {
-        const name = document.getElementById('userName').value;
-        if (!name || selected.length === 0) return alert("Escribe tu nombre y selecciona boletos.");
-
-        try {
-            for (let n of selected) {
-                const id = n.toString().padStart(2, '0');
-                await setDoc(doc(db, "boletos_vendidos", id), {
-                    cliente: name,
-                    fecha: new Date().toLocaleString(),
-                    pago: "pendiente",
-                    expira: new Date(Date.now() + 86400000).toLocaleString() // 24 Horas
-                });
+        function procesarCompra() {
+            if (seleccionados.length === 0) {
+                alert("Por favor, selecciona al menos un boleto.");
+            } else {
+                alert("Has seleccionado los boletos: " + seleccionados.join(", ") + ". Redirigiendo al pago...");
             }
-            const msg = `¡Hola! Aparté los boletos: ${selected.join(", ")}.%0A*Nombre:* ${name}%0A*Total:* $${selected.length * RIFA.precio}%0A_Ya tengo mi comprobante de pago._`;
-            window.open(`https://wa.me/${RIFA.whatsapp}?text=${msg}`, '_blank');
-            selected = [];
-            document.getElementById('userName').value = "";
-            render();
-        } catch (e) { alert("Error al conectar."); }
-    };
-</script>
+        }
+    </script>
 </body>
 </html>
