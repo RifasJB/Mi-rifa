@@ -21,7 +21,7 @@
 </head>
 <body>
 
-    <h1>Sorteo Gran Camioneta 2026</h1>
+    <h1>Sorteo Esclava de oro móaco chain</h1>
     <p>Selecciona tus números de la suerte:</p>
 
     <div id="contenedor-boletos" class="grid-boletos"></div>
@@ -67,3 +67,40 @@
     </script>
 </body>
 </html>
+async function guardarApartado() {
+    const n = document.getElementById('num-id').innerText;
+    const nombre = document.getElementById('nombre').value;
+    const tel = document.getElementById('telefono').value;
+    
+    // Tu número de WhatsApp (sin el signo +, solo números. Ej: 521234567890)
+    const TU_WHATSAPP = "526624203084"; 
+
+    if (nombre.length < 3 || tel.length < 10) return alert("Datos incompletos");
+
+    // 1. Guardamos en la base de datos de Supabase
+    const { data, error } = await supabase
+        .from('boletos')
+        .insert([{ 
+            numero: parseInt(n), 
+            nombre: nombre, 
+            telefono: tel, 
+            estado: 'apartado' 
+        }]);
+
+    if (error) {
+        alert("¡Ups! Este número ya ha sido apartado por alguien más.");
+    } else {
+        // 2. Creamos el mensaje para WhatsApp
+        const mensaje = `¡Hola! Acabo de apartar un número en tu página:%0A%0A` +
+                        `*Número:* ${n}%0A` +
+                        `*Nombre:* ${nombre}%0A` +
+                        `*WhatsApp:* ${tel}%0A%0A` +
+                        `En un momento te envío el comprobante de pago.`;
+
+        // 3. Redirigimos al cliente a tu WhatsApp
+        const urlWhatsapp = `https://wa.me/${TU_WHATSAPP}?text=${mensaje}`;
+        
+        alert("¡Apartado exitoso! Serás redirigido a WhatsApp para confirmar tu pago.");
+        window.location.href = urlWhatsapp;
+    }
+}
